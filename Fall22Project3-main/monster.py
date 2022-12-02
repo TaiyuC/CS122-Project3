@@ -35,7 +35,7 @@ class Monster:
         self.world.map[self.loc1][self.loc2].remove_monster(self)
         updater.deregister(self)
 
-class Super_Monster(Monster):
+class Super_Monster(Monster): # the difference is super monster is not going to move.
     def __init__(self, name, loc, world, hp = None, attack = None, defense = None):
         self.name = name if name == "You Know Who" else "SUPER " + name
         self.hp = random.randint(20,30) if hp == None else hp # randomly have hp, attack, defense, 
@@ -46,5 +46,7 @@ class Super_Monster(Monster):
         [self.loc1, self.loc2] = loc
         self.world.map[self.loc1][self.loc2].add_monster(self)
         self.captured = False
-        updater.register(self)
-
+    
+    def die(self):
+        self.world.map[self.loc1][self.loc2].remove_monster(self)
+    

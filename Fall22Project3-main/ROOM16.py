@@ -37,6 +37,12 @@ class Room:
                 return i
         return False
     
+    def get_item_by_name(self, name):
+        for i in self.items:
+            if i.name.lower() == name.lower():
+                return i
+        return False
+    
     # def emergency_exit(self):
     #     return random.choice(self.exits)
     
