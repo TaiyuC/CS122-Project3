@@ -15,7 +15,11 @@ class Monster:
         updater.register(self)
 
     def __repr__(self):
-        str = f"_{self.name}_ hp:{self.hp}"
+        str = f" {self.name}: {self.hp} HP {self.attack} ATK {self.defense} DEF"
+        return str
+    
+    def glimpse(self):
+        str = f" {self.name}: {self.hp} HP "
         return str
 
     def update(self):
@@ -37,7 +41,7 @@ class Monster:
 
 class Super_Monster(Monster): # the difference is super monster is not going to move.
     def __init__(self, name, loc, world, hp = None, attack = None, defense = None):
-        self.name = name if name == "You Know Who" else "SUPER " + name
+        self.name = name if name == "TaoTie" else ("Fierce" + name)
         self.hp = random.randint(20,30) if hp == None else hp # randomly have hp, attack, defense, 
         self.maxhp = int(self.hp)
         self.attack = random.randint(7,10) if attack == None else attack
@@ -46,7 +50,14 @@ class Super_Monster(Monster): # the difference is super monster is not going to 
         [self.loc1, self.loc2] = loc
         self.world.map[self.loc1][self.loc2].add_monster(self)
         self.captured = False
-    
     def die(self):
         self.world.map[self.loc1][self.loc2].remove_monster(self)
+    
+    def __repr__(self):
+        str = f" {self.name} about {self.hp + random.randint(-10, 10)} HP"
+        return str
+    
+    def glimpse(self):
+        str = f" {self.name}: X HP "
+        return str
     

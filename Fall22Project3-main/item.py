@@ -13,10 +13,7 @@ class Item:
         self.hold = False
 
     def describe(self):
-        clear()
-        print(self.desc)
-        print()
-        input("Press enter to continue...")
+        return self.desc
 
     def put_in_loc(self, loc):
         self.loc1,self.loc2 = loc

@@ -1,5 +1,7 @@
+from item import Item
 import os
-
+import random
+import time
 
 def clear():
     os.system('cls' if os.name == 'nt' else 'clear')
@@ -19,6 +21,7 @@ class Player:
         self.map = False
         self.acient_detector = False
         self.railgun = False
+        self.lv = 1
 
     def __repr__(self):
         return f"you are in {self.world.map[self.loc1][self.loc2]}"
@@ -75,8 +78,14 @@ class Player:
         clear()
         print("You are currently carrying:")
         print()
+        ret_dict = {}
         for i in self.items:
-            print(i.name)
+            if i.name in ret_dict:
+                ret_dict[str(i.name)] += 1
+            else:
+                ret_dict[str(i.name)] = 1
+        for key, value in ret_dict.items():
+            print(f"{value} {key}(s)")
         print()
         input("Press enter to continue...")
 
@@ -86,21 +95,80 @@ class Player:
         print()
         print("Your health is " + str(self.hp) + ".")
         print()
-        while self.alive:
-            self.hp -= int(5 ** (mon.attack/self.defense))
-            mon.hp -= int(5 ** (mon.attack/self.defense))
+        Finished = False
+        n = 0
+        use_gun = True
+        while not Finished:
+            self.hp -= int(5 ** (mon.attack/self.defense + random.random()))
+            mon.hp -= int(5 ** (mon.attack/self.defense + random.random()))
+            if self.railgun:
+                mon.hp -= 5
+            print(f"{n + 1}th round: your HP is {self.hp}, their HP is {mon.hp}")
             if mon.hp < 0:
                 mon.die()
                 if self.hp < self.maxhp/3:
                     print("You are badly injured. Your health is now " + str(self.hp) + ".")
                 else:
                     print("You win. Your health is now " + str(self.hp) + ".")
-                break
-            if mon.hp < mon.hp/3:
-                print(f"{mon.name} is badly injured, it has {mon.hp} HP.")
+                Finished = True
+                if random.random() < 0.5:
+                    self.world.item_by_roomtype(self.loc1, self.loc2)
+                    print("Some material is dropped on the floor")
+                else:
+                    print("That monster is not carrying any materials")
+            elif self.hp < 15:
+                correct_typing = False
+                while not correct_typing:
+                    print("** You are about to die. Want to run away?")
+                    inp = input("Yes/No? \n")
+                    if inp.lower() == "yes":
+                        correct_typing = True
+                        if random.random() < 0.4 :
+                            Finished = True
+                            print("You know you won't die! \n")
+                        else:
+                            print("Monster is chasing you! You are injured! \n")
+                            self.hp -= 1
+                    elif inp.lower() == "no":
+                        correct_typing = True
+                        print("Bring it on! \n")
+                    else:
+                        print("** try again! \n")
+            elif (mon.hp - 10) < 0:
+                if self.railgun:
+                    if use_gun:
+                        correct_typing = False
+                        while not correct_typing:
+                            print("** charge your railgun and Aim at monster? (need one turn to charge)")
+                            inp = input("Yes/No? \n")
+                            if inp.lower() == "yes":
+                                print("the monster attacks you while you are charging! ")
+                                self.hp -= int(5 ** (mon.attack/self.defense - random.random()))
+                                correct_typing = True
+                                if self.hp > 0:
+                                    for _ in range(15):
+                                        print("-",end = "")
+                                        time.sleep(0.07)
+                                    print("/////Boom!\\\\\\\\\\")
+                                    time.sleep(0.3)
+                                    print("The monster is successfully eliminated")
+                                    mon.die()
+                                    if self.hp < self.maxhp/3:
+                                        print("You are badly injured. Your health is now " + str(self.hp) + ".")
+                                    else:
+                                        print("You win. Your health is now " + str(self.hp) + ".")
+                                    Finished = True
+                            elif inp.lower() == "no":
+                                print("HAHA, not using a railgun is your battle style!")
+                                use_gun = False
+                                correct_typing = True
+                            else:
+                                print("try typing Yes or No")
             if self.hp < 0:
                 print("You lose.")
                 self.alive = False
+                Finished = True
+            n += 1
         print()
         input("Press enter to continue...")
     
@@ -113,7 +181,14 @@ class Player:
             else:
                 ret_dict[the_name] = 1
         return ret_dict
-    
+
+    def inspect_items(self, name):
+        for i in self.items:
+            if name.lower() == i.name:
+                return (i.describe())
+        return "no such item"
+        
+
     def can_craft(self):
         dict = self.count_item()
         if "wood" in dict and "acient gear" in dict and "magnetic" in dict: # wood can be used to build 
@@ -161,8 +236,8 @@ class Player:
                         self.map = True
                         self.item_remove("wood", 3)
                         self.item_remove("magnetic", 5)
-                        print
-                        print("Success!")
+                        self.items.append(Item("map", "see where you are, and you can teleport accurately to town with hp recovered", world =""))
+                        print("Success! Instruction is updated to help page")
                     else:
                         print("you cannot get a second map")
                 elif intend == "acient detector": 
@@ -170,20 +245,22 @@ class Player:
                         self.acient_detector = True
                         self.item_remove("acient gear", 5)
                         self.item_remove("acient core", 1)
-                        print("Success!")
+                        self.items.append(Item("acient detector", "see monster's distributions and more detailed statistics", world = ""))
+                        print("Success! Instruction is updated to help page")
                     else:
-                        print("having other detectors cannot detect other monsters")
+                        print("having other detectors cannot detect not existed monsters")
                 elif intend == "railgun":
                     if not self.railgun:
                         self.railgun = True
                         self.item_remove("acient gear", 3)
                         self.item_remove("magnetic", 3)
                         self.item_remove("wood", 5)
-                        print("Success!")
+                        self.items.append(Item("railgun", "a great tool for battle", world = ""))
+                        print("Success! Now you may visit the palace to see whether you can fight against TaoTie")
                     else:
-                        print("You cannot use a second railgun! You are not four hand monster!")
+                        print("You cannot have a second railgun! You are not four hand monster!")
                 else:
-                    print("I cannot craft that, wait for 100 years or try another name")
+                    print("I cannot craft that, wait for 100 years so it is invented")
                 print()
                 input("Press enter to continue...")
             else:
