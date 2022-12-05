@@ -3,7 +3,6 @@ from monster import Monster
 from monster import Super_Monster
 from item import Item
 import random
-import names
 
 class World:
     def __init__(self, gridsize = 4): # default is 4*4 world
@@ -57,7 +56,7 @@ class World:
         for _ in range(num_monster):
             [loc1,loc2] = self.monster_loc()
             self.create_mon(loc1, loc2)
-        Super_Monster(name = "TaoTie", loc = [self.gridsize-1, self.gridsize-1], world = self, hp = 150, attack = 15, defense = 20) # create boss at palace
+        Super_Monster(name = "TaoTie", loc = [self.gridsize-1, self.gridsize-1], world = self, hp = 150, attack = 15, defense = 20, short_name = "TT") # create boss at palace
     
     def w_has_monster(self, loc):
         """determine whether this location in the world has monster"""
@@ -120,7 +119,7 @@ class World:
             the_loc = random.choice(des_loc)
             core = Item(name = "acient core", desc = "we may use acient core make something interesting", world = self)
             core.put_in_loc(the_loc)
-            Super_Monster(name = "QiongQi", loc = the_loc, world = self, attack = 15, defense= 12, hp = 50)
+            Super_Monster(name = "QiongQi the core guard", loc = the_loc, world = self, attack = 15, defense= 15, hp = 50, short_name="QQ")
     
     def item_new(self, n = 1):
         for _ in range(n):
@@ -129,10 +128,11 @@ class World:
     
     def create_mon(self, loc1, loc2):
         mon_name = random.choice(["NineTails", "Unicorn", "GuanShu", "Zheng", "GuDiao", "Lili", "ZhuYin", "QiongQi", "HunDun"])
+        mon_short_name = ''.join([c for c in mon_name if c.isupper()])
         if mon_name != "HunDun" and mon_name != "QiongQi": # randomly have normal monster and super monster(QiongQi, ZhuYin), super monster is stronger.
-            Monster(name = mon_name, loc = [loc1, loc2], world = self)
+            Monster(name = mon_name, loc = [loc1, loc2], world = self, short_name = mon_short_name)
         else:
-            Super_Monster(name = mon_name, loc = [loc1, loc2], world = self) # we have the super monster which is harder to battle
+            Super_Monster(name = mon_name, loc = [loc1, loc2], world = self, short_name= mon_short_name) # we have the super monster which is harder to battle
 
     def mon_new(self, n = 1):
         for _ in range(n):

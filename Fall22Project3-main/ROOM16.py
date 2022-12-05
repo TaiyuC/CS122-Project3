@@ -36,6 +36,8 @@ class Room:
         for i in self.monsters:
             if i.name.lower() == name.lower():
                 return i
+            elif i.short_name.lower() == name.lower():
+                return i
         return False
     
     def get_item_by_name(self, name):

@@ -15,11 +15,11 @@ def create_world():
     return w
 
 w = create_world()
-player = Player(world= w, hp= 100)
+player = Player(world= w, hp= 50)
 
-player.railgun = True
-player.acient_detector = True
-player.map = True
+# player.railgun = True
+# player.acient_detector = True
+# player.map = True
 
 # for _ in range(10):  #this is just for beta testing
 #     wo = Item(name = "wood", desc = "we may use wood to make something", world = w)
@@ -109,7 +109,7 @@ def heal_at_town():
     clear()
     if player.loc1 == 0 and player.loc2 == 0:
         if player.hp == player.maxhp:
-            print("Healing stone is not responding...")
+            print("the Healing stone is not responding...")
         else:
             player.hp = player.maxhp
             print("You are good to go!")

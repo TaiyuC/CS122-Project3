@@ -7,14 +7,14 @@ def clear():
     os.system('cls' if os.name == 'nt' else 'clear')
 
 class Player:
-    def __init__(self, world, hp = 50):
+    def __init__(self, world, hp = 80):
         self.loc1 = 0 # start in town
         self.loc2 = 0
         self.items = [] 
         self.hp = hp
         self.maxhp = int(self.hp)
-        self.attack = 10
-        self.defense = 10
+        self.attack = 7
+        self.defense = 7
         self.monster = []
         self.alive = True
         self.world = world
@@ -92,6 +92,17 @@ class Player:
         print()
         input("Press enter to continue...")
     
+    def level_up(self):
+        if self.lv < 10:
+            self.lv += 1
+            self.attack += 1
+            self.defense += 1
+            self.maxhp += 5
+            self.hp += 5
+            return True
+        else:
+            return False
+    
     def kill_monster(self, mon):
         mon.die()
         if mon.name.lower() == "taotie":
@@ -103,14 +114,15 @@ class Player:
             self.leaving = True
         else:
             if self.hp < self.maxhp/3:
-                print("You are badly injured. Your health is now " + str(self.hp) + ".")
+                print("You are badly injured. Your health is " + str(self.hp) + ".")
             else:
-                print("You win. Your health is now " + str(self.hp) + ".")
-            if random.random() < 0.5:
+                print("You win. Your health is " + str(self.hp) + ".")
+            if random.random() < 0.6:
                 self.world.item_by_roomtype(self.loc1, self.loc2)
                 print("Some material is dropped on the floor")
             else:
-                print("Unlucky! No item dropped")
+                self.level_up()
+                print(f"You reached level {self.lv}, your are stronger than before.")
 
 
     def attack_monster(self, mon):
