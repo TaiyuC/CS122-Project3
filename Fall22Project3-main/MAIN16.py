@@ -17,9 +17,9 @@ def create_world():
 w = create_world()
 player = Player(world= w, hp= 100)
 
-# player.railgun = True
-# player.acient_detector = True
-# player.map = True
+player.railgun = True
+player.acient_detector = True
+player.map = True
 
 # for _ in range(10):  #this is just for beta testing
 #     wo = Item(name = "wood", desc = "we may use wood to make something", world = w)
@@ -120,7 +120,11 @@ def heal_at_town():
 
 def show_help():
     clear()
-    print("go <direction> -- moves you in the given direction")
+    print("---------------------------------")
+    if not player.map:
+        print("go <direction> -- moves you in the given direction, craft the map to improve this feature")
+    else:
+        print("go <direction> <direction>... -- moves you along the given path (you will be lost if the path is not valid)")
     print("inventory -- opens your inventory")
     print("pickup <item> -- picks up the item")
     if not player.map:
@@ -132,7 +136,7 @@ def show_help():
         print("craft -- craft something to help you, try to get more materials to see items can be crafted")
     print("attack <monster name> -- fight with monster")
     if player.map:
-        print("map -- see the whole world and where you are. leftup corner is [0,0]")
+        print("map -- see the whole world and where you are.")
     if player.acient_detector:
         print("detect -- see more accurate and detailed monster statistics and distribution when having a detector")
     else:
@@ -207,6 +211,10 @@ def inspection(word):
 if __name__ == "__main__":
     playing = True
     while playing and player.alive:
+        if player.leaving:
+            print()
+            playing = False
+            break
         print_situation()
         command_success = False
         time_passes = False
@@ -220,12 +228,26 @@ if __name__ == "__main__":
                 continue
             match command_words[0].lower():
                 case "go":   #cannot handle multi-word directions
-                    okay = player.go_direction(command_words[1]) 
-                    if okay:
-                        time_passes = True
-                    else:
-                        print("You can't go that way.")
-                        command_success = False
+                    if len(command_words) > 1:
+                        if player.map and len(command_words) > 2:
+                            valid_path = True
+                            for i in range(1, len(command_words)):
+                                valid_path = valid_path and player.go_direction(command_words[i]) 
+                            if valid_path:
+                                time_passes = True
+                            else:
+                                [player.loc1,player.loc2] = w.monster_loc()
+                                print("You can't go that path, you are lost")
+                                command_success = True
+                                print()
+                                input("Press enter to continue...")
+                        else:
+                            okay = player.go_direction(command_words[1]) 
+                            if okay:
+                                time_passes = True
+                            else:
+                                print("You can't go that way.")
+                                command_success = False
                 case "teleport":
                     teleport()
                 case "me":
@@ -234,9 +256,15 @@ if __name__ == "__main__":
                     show_map()
                 case "detect":
                     view_mon()
+                case "det":
+                    view_mon()
                 case "pickup":  #can handle multi-word objects
                     pick_up()
+                case "pick":
+                    pick_up
                 case "inventory":
+                    player.show_inventory()
+                case "inv":
                     player.show_inventory()
                 case "craft":
                     player.make_craft()
@@ -255,6 +283,8 @@ if __name__ == "__main__":
                         print("No such monster.")
                         command_success = False
                 case "inspect":
+                    inspection(command[8:])
+                case "insp":
                     inspection(command[8:])
                 case other:
                     print("Not a valid command")
