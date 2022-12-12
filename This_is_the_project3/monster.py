@@ -6,7 +6,7 @@ class Monster:
         """initialize monster, name, location, and world are necessary input, other can be randomly generated or assigned"""
         self.name = name
         self.hp = random.randint(10,20) if hp == None else hp # randomly have hp, attack, defense, 
-        #self.maxhp = int(self.hp)
+        self.maxhp = int(self.hp)
         self.attack = random.randint(1,8) if attack == None else attack
         self.defense = random.randint(1,8) if defense == None else defense
         self.world = world # use this world system we can have world registered here
